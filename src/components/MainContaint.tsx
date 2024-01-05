@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Navbar from "./Navbar";
+import DateRangePicker from "./DateRangePicker";
 
 const MainContent: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const MainContent: React.FC = () => {
         </div>
         {/* Add more components and charts for other sections */}
       </div>
+      <DateRangePicker />
      
     </motion.div>
   );

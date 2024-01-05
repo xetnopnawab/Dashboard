@@ -2,6 +2,7 @@
 import Sidebar from "./components/Sidebar";
 import React, { useState } from "react";
 
+
 import MainContent from "./components/MainContaint";
 
 const App: React.FC = () => {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
     <div className="flex h-screen">
       <Sidebar onSectionChange={handleSectionChange} />
       <MainContent />
+     
     </div>
   );
 };
