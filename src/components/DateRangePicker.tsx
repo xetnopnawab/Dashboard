@@ -1,22 +1,29 @@
-// components/DateRangePicker.tsx
+// components/DateRangeCalendar.tsx
 
 import React, { useState } from 'react';
-import { format, addDays, isAfter } from 'date-fns';
+import { format, addDays, isAfter, isSameDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 
 const DateRangePicker: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(addDays(new Date(), 7));
 
-  const generateDates = (start: Date, end: Date): Date[] => {
-    const dates = [];
-    let currentDate = start;
+  const generateCalendarDates = (start: Date, end: Date): Date[][] => {
+    const dates = eachDayOfInterval({ start, end });
+    const calendarDates: Date[][] = [];
 
-    while (isAfter(currentDate, end) === false) {
-      dates.push(currentDate);
-      currentDate = addDays(currentDate, 1);
-    }
+    let week: Date[] = [];
+    dates.forEach((date) => {
+      if (week.length === 7) {
+        calendarDates.push(week);
+        week = [];
+      }
+      week.push(date);
+    });
 
-    return dates;
+    // Add the last week
+    calendarDates.push(week);
+
+    return calendarDates;
   };
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,15 +36,11 @@ const DateRangePicker: React.FC = () => {
     setEndDate(selectedDate);
   };
 
-  const renderedDates = generateDates(startDate!, endDate!).map((date) => (
-    <div key={date.getTime()} className="p-2">
-      {format(date, 'MM/dd/yyyy')}
-    </div>
-  ));
+  const calendarDates = generateCalendarDates(startOfWeek(startOfMonth(startDate!)), endOfWeek(endOfMonth(endDate!)));
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Date Range Picker</h2>
+      <h2 className="text-2xl font-bold mb-4">Date Range Calendar</h2>
       <div className="flex space-x-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Start Date</label>
@@ -58,7 +61,26 @@ const DateRangePicker: React.FC = () => {
           />
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap">{renderedDates}</div>
+      <div className="mt-4 grid grid-cols-7 gap-2">
+        {calendarDates.map((week, weekIndex) => (
+          <React.Fragment key={weekIndex}>
+            {week.map((date) => (
+              <div
+                key={date.getTime()}
+                className={`p-2 border ${
+                  isSameDay(date, startDate!) || isSameDay(date, endDate!)
+                    ? 'bg-blue-500 text-white'
+                    : isAfter(date, endDate!) || isAfter(date, startDate!)
+                    ? 'text-gray-500'
+                    : 'text-black'
+                } rounded text-center`}
+              >
+                {format(date, 'd')}
+              </div>
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 };
